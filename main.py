@@ -80,6 +80,15 @@ def features():
     return render_template('features.html', title='Features')
 
 
+@app.route('/new/<int:new_id>')
+def new(new_id):
+    db_sess = db_session.create_session()
+    new = db_sess.query(News).filter(News.id == new_id).first()
+    user = db_sess.query(User).filter(new.user_id == User.id).first()
+    return render_template('new.html', title=new.title,
+                           new=new, user=user)
+
+
 @app.route('/newpost', methods=['POST', 'GET'])
 def new_post():
     form = AddNew()
