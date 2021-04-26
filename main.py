@@ -22,7 +22,16 @@ def load_user(user_id):
 @app.route('/home')
 def home():
     session = db_session.create_session()
-    return render_template('home.html', title='ShareNews.com')
+    news = session.query(News).filter(News.is_private != True)
+    return render_template('home.html', title='ShareNews.com', news=news)
+
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect("/")
+
 
 @app.route('/register', methods=['GET', 'POST'])
 def reqister():
@@ -51,6 +60,24 @@ def reqister():
         return redirect('/login')
     return render_template('register.html', title='Регистрация', form=form)
 
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    form = LoginForm()
+    if form.validate_on_submit():
+        db_sess = db_session.create_session()
+        user = db_sess.query(User).filter(User.email == form.email.data).first()
+        if user and user.check_password(form.password.data):
+            login_user(user, remember=form.remember_me.data)
+            return redirect("/")
+        return render_template('login.html',
+                               message="Неправильный логин или пароль", form=form)
+    return render_template('login.html', title='Авторизация', form=form)
+
+
+@app.route('/features')
+def features():
+    return render_template('features.html', title='Features')
 
 if __name__ == '__main__':
     app.debug = True
