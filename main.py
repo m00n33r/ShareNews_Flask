@@ -79,6 +79,25 @@ def login():
 def features():
     return render_template('features.html', title='Features')
 
+
+@app.route('/newpost', methods=['POST', 'GET'])
+def new_post():
+    form = AddNew()
+    if form.validate_on_submit():
+        if not current_user.is_authenticated:
+            return render_template('newpost.html', title='Добавить новость',
+                                   form=form, message='Вы не вошли в систему')
+        db_sess = db_session.create_session()
+        added_new = News(title=form.title.data,
+                         content=form.content.data,
+                         is_private=form.private.data,
+                         user_id=current_user.id)
+        db_sess.add(added_new)
+        db_sess.commit()
+        return redirect('/home')
+    return render_template('newpost.html', title='Добавить новость', form=form)
+
+
 if __name__ == '__main__':
     app.debug = True
     app.run(port=8080, host='127.0.0.1')
