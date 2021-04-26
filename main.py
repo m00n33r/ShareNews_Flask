@@ -4,16 +4,21 @@ from data import db_session
 from data.__all_models import User, News
 from forms import RegisterForm, LoginForm, AddNew, UserBio
 
+"""Создаем сайт"""
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
+
+"""Инициализируем базу данных logs.db"""
 db_session.global_init("db/logs.db")
 
+"""Инициализируем логин менеджер, привязываем его к нашему сайту"""
 login_manager = LoginManager()
 login_manager.init_app(app)
 
 
 @login_manager.user_loader
 def load_user(user_id):
+    """Функция для получения пользователя, украшенная декоратором login_manager.user_loader"""
     session = db_session.create_session()
     return session.query(User).get(user_id)
 
@@ -21,6 +26,7 @@ def load_user(user_id):
 @app.route('/')
 @app.route('/home')
 def home():
+    """Главное меню сайта"""
     session = db_session.create_session()
     news = session.query(News).filter(News.is_private != True)
     return render_template('home.html', title='ShareNews.com', news=news)
@@ -29,12 +35,18 @@ def home():
 @app.route('/logout')
 @login_required
 def logout():
+    """Мы «забываем» пользователя при помощи функции logout_user и
+     перенаправляем его на главную страницу нашего приложения"""
     logout_user()
     return redirect("/")
 
 
 @app.route('/register', methods=['GET', 'POST'])
 def reqister():
+    """Форма регистрации нашего пользователя.
+    При прохождении ее пользователем все введенные им данные
+    перенапраляются в базу данных, а самого пользователя
+    перенаправляют на форму вхождения в систему"""
     form = RegisterForm()
     if form.validate_on_submit():
         if len(form.email.data) < 4:
@@ -63,6 +75,11 @@ def reqister():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    """Если форма логина прошла валидацию, мы находим пользователя с введенной почтой,
+     проверяем, введен ли для него правильный пароль, если да,
+      вызываем функцию login_user модуля flask-login и передаем туда объект
+      нашего пользователя, а также значение галочки «Запомнить меня»."""
+
     form = LoginForm()
     if form.validate_on_submit():
         db_sess = db_session.create_session()
@@ -75,36 +92,38 @@ def login():
     return render_template('login.html', title='Авторизация', form=form)
 
 
-@app.route('/features')
-def features():
-    return render_template('features.html', title='Features')
-
-
 @app.route('/new/<int:new_id>')
 def new(new_id):
+    """Страница новости крупным планом. На ней есть новость,
+    ее заголовок и кто ее создал"""
+
     db_sess = db_session.create_session()
     new = db_sess.query(News).filter(News.id == new_id).first()
     user = db_sess.query(User).filter(new.user_id == User.id).first()
-    return render_template('new.html', title=new.title,
-                           new=new, user=user)
+
+    return render_template('new.html', title=new.title, new=new, user=user)
 
 
 @app.route('/user/<int:u_id>')
 def user(u_id):
+    """Страница другого пользователя. На ней можем увидеть все данные о нём."""
     session = db_session.create_session()
     user = session.query(User).filter(User.id == u_id).first()
     news = session.query(News).filter(News.user_id == u_id, News.is_private != True).all()
+
     return render_template('user.html', user=user, news=news)
 
 
 @app.route('/bio', methods=['POST', 'GET'])
 def bio():
+    """Страница профиля нашего пользователя. Здесь он сможет изменить
+    имя, почту, пароль, а также информацию о себе"""
     session = db_session.create_session()
+    form = UserBio()
+    msg = ''
     news = session.query(News).filter(current_user.id == News.user_id).all()
     user = session.query(User).filter(current_user.id == User.id).first()
 
-    msg = ''
-    form = UserBio()
     if form.validate_on_submit():
         arr = []
         if form.name.data:
@@ -126,6 +145,8 @@ def bio():
 
 @app.route('/newpost', methods=['POST', 'GET'])
 def new_post():
+    """Страница создания нового поста. При получении формы мы все данные,
+     которые написал пользователь переписываем в базу данных news"""
     form = AddNew()
     if form.validate_on_submit():
         if not current_user.is_authenticated:
@@ -140,6 +161,11 @@ def new_post():
         db_sess.commit()
         return redirect('/home')
     return render_template('newpost.html', title='Добавить новость', form=form)
+
+
+@app.route('/features')
+def features():
+    return render_template('features.html', title='Features')
 
 
 if __name__ == '__main__':
