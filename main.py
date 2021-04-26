@@ -89,6 +89,14 @@ def new(new_id):
                            new=new, user=user)
 
 
+@app.route('/user/<int:u_id>')
+def user(u_id):
+    session = db_session.create_session()
+    user = session.query(User).filter(User.id == u_id).first()
+    news = session.query(News).filter(News.user_id == u_id, News.is_private != True).all()
+    return render_template('user.html', user=user, news=news)
+
+
 @app.route('/bio', methods=['POST', 'GET'])
 def bio():
     session = db_session.create_session()
