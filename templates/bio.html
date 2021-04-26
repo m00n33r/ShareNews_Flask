@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<ul class="nav justify-content-end">
+    <a class="btn btn-danger " href="/home">Back</a>
+</ul>
+<h1 align="center">
+    <em>Личный кбинет пользователя: {{current_user.name}}</em>
+</h1>
+<p align="center">{{ message }}</p>
+
+<h4>Ваше имя: {{ current_user.name }}</h4>
+<h4>Ваш возраст: {{ current_user.age }}</h4>
+<h4>О вас: {{ current_user.bio }}</h4>
+<h4>Дата регистрации: {{ current_user.signed_date }}</h4>
+
+<p>
+</p>
+
+<form action="" method="post">
+    {{ form.hidden_tag() }}
+    {{ form.csrf_token }}
+    <p>
+        {{ form.name.label }}
+        {{ form.name(class="form-control") }}
+    </p>
+    <p>
+        {{ form.email.label }}
+        {{ form.email(class="form-control", type="email") }}
+    </p>
+    <p>
+        {{ form.password.label }}
+        {{ form.password(class="form-control", type="password") }}
+    </p>
+    <p>
+        {{ form.password_again.label }}
+        {{ form.password_again(class="form-control", type="password") }}
+    </p>
+    <p>
+        {{ form.bio.label }}
+        {{ form.bio(class="form-control") }}
+    </p>
+    <p>{{ form.submit(type="submit", class="btn btn-outline-success") }}</p>
+</form>
+
+<p>
+</p>
+
+{% if news|length %}
+<h2 align="center"><u>А вот и ваши новости:</u></h2>
+<div class="container">
+    <div class="row">
+        {% for new in news %}
+        <div class="col-md-4">
+            <h2>{{new.title}}</h2>
+            {% if new.content|length > 150 %}
+            <p class="card-text">{{new.content[:149]}}...</p>
+            {% else %}
+            <p class="card-text">{{new.content}}</p>
+            {% endif %}
+            <a href="/new/{{new.id}}" class="btn btn-outline-success">Посмотреть</a>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% else %}
+<h2 align="center">У вас пока нет ни одной записи :(</h2>
+<p align="center">* их можно добавить в гланом меню, зарегистрировавшись</p>
+{% endif %}
+<p>
+</p>
+{% endblock %}

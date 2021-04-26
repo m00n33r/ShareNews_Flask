@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1 align="center">
+    <em>Личный кбинет пользователя: {{user.name}}</em>
+</h1>
+
+<h4>Имя: {{ user.name }}</h4>
+<h4>Возраст: {{ user.age }}</h4>
+<h4>Доп. информация: {{ user.bio }}</h4>
+<h4>Дата регистрации пользователя: {{ user.signed_date }}</h4>
+
+{% if news|length %}
+<h2 align="center"><u>Новости пользователя {{user.name}}:</u></h2>
+<div class="container">
+    <div class="row">
+        {% for new in news %}
+        <div class="col-md-4">
+            <h2>{{new.title}}</h2>
+            {% if new.content|length > 150 %}
+            <p class="card-text">{{new.content[:149]}}...</p>
+            {% else %}
+            <p class="card-text">{{new.content}}</p>
+            {% endif %}
+            <a href="/new/{{new.id}}" class="btn btn-outline-success">Посмотреть</a>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% else %}
+<h2 align="center">У этого пользователя пока нет ни одной записи :(</h2>
+{% endif %}
+<p>
+</p>
+{% endblock %}

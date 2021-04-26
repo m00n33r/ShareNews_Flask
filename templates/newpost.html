@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block content %}
+<ul class="nav justify-content-end">
+    <a class="btn btn-danger " href="/home">Back</a>
+</ul>
+
+<h1>Добавить новость</h1>
+<form action="" method="post">
+    {{ form.hidden_tag() }}
+    <div class="mb-3">
+        <label for="exampleFormControlInput1" class="form-label">{{ form.title.label }}</label>
+        {{ form.title(class="form-control", type="text", id="exampleFormControlInput1", placeholder="Заголовок") }}
+    </div>
+
+    <div class="mb-3">
+        <label for="exampleFormControlTextarea1" class="form-label">{{ form.content.label }}</label>
+        {{ form.content(class="form-control", id="exampleFormControlTextarea1", rows="3") }}
+    </div>
+    <p>{{ form.private() }} {{ form.private.label }}</p>
+    <p>{{ form.submit(type="submit", class="btn btn-outline-success") }}</p>
+    <p>{{message}}</p>
+</form>
+{% endblock %}

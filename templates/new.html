@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>
+    {{new.title}}
+</h1>
+<h5><small class="text-muted">by <a href="/user/{{ user.id }}">{{ user.name }}</a></small></h5>
+<p>
+</p>
+<h4><em>{{new.content}}</em></h4>
+{% endblock %}
