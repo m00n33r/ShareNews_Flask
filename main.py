@@ -89,6 +89,33 @@ def new(new_id):
                            new=new, user=user)
 
 
+@app.route('/bio', methods=['POST', 'GET'])
+def bio():
+    session = db_session.create_session()
+    news = session.query(News).filter(current_user.id == News.user_id).all()
+    user = session.query(User).filter(current_user.id == User.id).first()
+
+    msg = ''
+    form = UserBio()
+    if form.validate_on_submit():
+        arr = []
+        if form.name.data:
+            arr.append('имя')
+            user.name = form.name.data
+        if form.email.data:
+            arr.append('почту')
+            user.email = form.email.data
+        if form.password.data == form.password_again.data and form.password.data:
+            arr.append('пароль')
+            user.set_password(form.password.data)
+        if form.bio.data:
+            arr.append('информацию о себе')
+            user.bio = form.bio.data
+        msg += 'Вы успешно сменили ' + ', '.join(arr) + '.'
+        session.commit()
+    return render_template('bio.html', form=form, title='Личный кабинет', news=news, message=msg)
+
+
 @app.route('/newpost', methods=['POST', 'GET'])
 def new_post():
     form = AddNew()
