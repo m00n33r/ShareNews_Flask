@@ -59,6 +59,9 @@ flask run
 - Article loading: <500ms
 - Concurrent users: 100+
 - DB queries optimized with SQLAlchemy 2.0
+## ⚙️ Future updates
+- Better frontend
+- Faster article load (using Redis)
 
 ---
 
